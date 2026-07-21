@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #0b0b0c;
+  --color-surface-1: #141416;
+  --color-surface-2: #1c1c1f;
+  --color-ink: #f3f1ec;
+  --color-ink-muted: #9c9a94;
+  --color-ink-faint: #605e59;
+  --color-line: #2a2a2c;
+  --color-accent: #c81e3a;
+  --color-accent-soft: #2b1216;
+
+  --font-display: "Anton", sans-serif;
+  --font-body: "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* Visible keyboard focus everywhere, incl. through Tailwind's reset */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Signature claw-mark divider — the three scratch lines already used under
+   the brand's own SW mark, reused here as the site's structural signature. */
+.claw-divider {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 84px;
+}
+.claw-divider span {
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 1px;
+}
+.claw-divider span:nth-child(1) { width: 100%; }
+.claw-divider span:nth-child(2) { width: 78%; }
+.claw-divider span:nth-child(3) { width: 56%; }
+[dir="rtl"] .claw-divider span:nth-child(1) { align-self: flex-end; }
+[dir="rtl"] .claw-divider span:nth-child(2) { align-self: flex-end; }
+[dir="rtl"] .claw-divider span:nth-child(3) { align-self: flex-end; }
