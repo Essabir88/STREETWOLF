@@ -43,8 +43,8 @@ export function AddToCartForm({
 
   if (soldOut) {
     return (
-      <div className="rounded-md border border-line bg-surface-1 px-4 py-3 text-sm text-ink-muted">
-        هذا الإصدار نفدت كميته بالكامل. تابعنا لمعرفة الإصدار القادم.
+      <div className="edition-plate px-4 py-3 text-sm text-ink-muted">
+        Cette édition est entièrement épuisée. Suivez-nous pour le prochain drop.
       </div>
     );
   }
@@ -53,16 +53,18 @@ export function AddToCartForm({
     <div className="space-y-5">
       {sizes.length > 0 && (
         <div>
-          <p className="mb-2 text-sm text-ink-muted">المقاس</p>
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
+            Taille
+          </p>
           <div className="flex flex-wrap gap-2">
             {sizes.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => setSize(s)}
-                className={`flex h-10 min-w-10 items-center justify-center rounded-md border px-3 font-mono text-sm transition ${
+                className={`flex h-10 min-w-10 items-center justify-center border px-3 font-mono text-sm transition ${
                   size === s
-                    ? "border-accent bg-accent-soft text-ink"
+                    ? "border-silver bg-surface-2 text-ink"
                     : "border-line text-ink-muted hover:border-ink-faint hover:text-ink"
                 }`}
               >
@@ -74,7 +76,9 @@ export function AddToCartForm({
       )}
 
       <div className="flex items-center gap-4">
-        <p className="text-sm text-ink-muted">الكمية</p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
+          Quantité
+        </p>
         <QuantityStepper
           value={quantity}
           onChange={setQuantity}
@@ -86,17 +90,17 @@ export function AddToCartForm({
         <button
           type="button"
           onClick={handleAdd}
-          className="flex-1 rounded-md bg-accent px-6 py-3 text-center font-display uppercase tracking-widest text-ink transition hover:opacity-90"
+          className="flex-1 bg-accent px-6 py-3.5 text-center font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90"
         >
-          إضافة إلى السلة — {formatPrice(priceCents * quantity)}
+          Ajouter au panier — {formatPrice(priceCents * quantity)}
         </button>
         {justAdded && (
           <button
             type="button"
             onClick={() => router.push("/cart")}
-            className="rounded-md border border-line px-4 py-3 text-sm text-ink transition hover:border-accent"
+            className="border border-line px-4 py-3.5 text-sm text-ink transition hover:border-silver"
           >
-            أُضيف ✓ — عرض السلة
+            Ajouté ✓ — Voir le panier
           </button>
         )}
       </div>

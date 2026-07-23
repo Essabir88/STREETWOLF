@@ -14,7 +14,9 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  return { title: product ? `${product.name} — Street Wolf` : "المنتج غير موجود" };
+  return {
+    title: product ? `${product.name} — Street Wolf` : "Produit introuvable",
+  };
 }
 
 export default async function ProductPage({
@@ -32,7 +34,7 @@ export default async function ProductPage({
     <div className="mx-auto max-w-6xl px-5 py-12">
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="space-y-3">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-md border border-line bg-surface-2">
+          <div className="edition-plate relative aspect-[4/5] overflow-hidden bg-surface-2">
             {product.images[0] && (
               <Image
                 src={product.images[0]}
@@ -49,7 +51,7 @@ export default async function ProductPage({
               {product.images.slice(1).map((img) => (
                 <div
                   key={img}
-                  className="relative aspect-square overflow-hidden rounded-md border border-line bg-surface-2"
+                  className="edition-plate relative aspect-square overflow-hidden bg-surface-2"
                 >
                   <Image src={img} alt={product.name} fill className="object-cover" />
                 </div>
@@ -59,12 +61,15 @@ export default async function ProductPage({
         </div>
 
         <div>
-          <h1 className="font-display text-4xl uppercase tracking-wide text-ink">
+          <div className="claw-divider mb-4" />
+          <h1 className="font-display text-6xl font-900 uppercase leading-[0.9] tracking-[0.02em] text-ink">
             {product.name}
           </h1>
-          <p className="mt-2 text-ink-muted">{product.tagline}</p>
-          <p className="mt-4 font-mono text-2xl text-ink">{formatPrice(product.priceCents)}</p>
-          <div className="mt-3">
+          <p className="mt-3 text-ink-muted">{product.tagline}</p>
+          <p className="mt-5 font-mono text-3xl text-ink">
+            {formatPrice(product.priceCents)}
+          </p>
+          <div className="edition-plate mt-5 p-4">
             <EditionBadge
               totalStock={product.totalStock}
               stockRemaining={product.stockRemaining}
@@ -88,7 +93,9 @@ export default async function ProductPage({
 
       <div className="mx-auto mt-20 max-w-2xl border-t border-line pt-12">
         <div className="claw-divider mb-4" />
-        <h2 className="font-display text-2xl uppercase tracking-wide text-ink">القصة</h2>
+        <h2 className="font-display text-3xl font-700 uppercase tracking-[0.04em] text-ink">
+          L’histoire
+        </h2>
         <div className="mt-4 space-y-4 leading-8 text-ink-muted">
           {storyParagraphs.map((para, i) => (
             <p key={i}>{para}</p>

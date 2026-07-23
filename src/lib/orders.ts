@@ -48,13 +48,13 @@ export async function placeOrder(
 ) {
   return db.transaction(async (tx) => {
     const [user] = await tx.select().from(users).where(eq(users.id, userId)).limit(1);
-    if (!user) throw new CheckoutError("المستخدم غير موجود.");
+    if (!user) throw new CheckoutError("Utilisateur introuvable.");
 
     if (pointsToRedeem % REDEEM_STEP !== 0) {
-      throw new CheckoutError(`النقاط تُستبدل بمضاعفات ${REDEEM_STEP} فقط.`);
+      throw new CheckoutError(`Les points s'échangent par tranches de ${REDEEM_STEP}.`);
     }
     if (pointsToRedeem > user.points) {
-      throw new CheckoutError("رصيد النقاط غير كافٍ لهذا الاستبدال.");
+      throw new CheckoutError("Solde de points insuffisant pour cet échange.");
     }
 
     let subtotalCents = 0;
@@ -75,11 +75,11 @@ export async function placeOrder(
         .limit(1);
 
       if (!product || !product.active) {
-        throw new CheckoutError("أحد المنتجات في السلة لم يعد متوفراً.");
+        throw new CheckoutError("Un article du panier n'est plus disponible.");
       }
       if (product.stockRemaining < item.quantity) {
         throw new CheckoutError(
-          `الكمية المطلوبة من "${product.name}" غير متوفرة — تبقّى ${product.stockRemaining} فقط.`
+          `Quantité demandée pour « ${product.name} » indisponible — il n'en reste que ${product.stockRemaining}.`
         );
       }
 
@@ -94,7 +94,7 @@ export async function placeOrder(
     }
 
     if (preparedItems.length === 0) {
-      throw new CheckoutError("السلة فارغة.");
+      throw new CheckoutError("Le panier est vide.");
     }
 
     const discountCents = Math.min(
@@ -147,7 +147,7 @@ export async function placeOrder(
         id: randomUUID(),
         userId,
         amount: -pointsToRedeem,
-        reason: "استبدال نقاط عند الشراء",
+        reason: "Points échangés à la commande",
         orderId,
       });
     }
@@ -156,7 +156,7 @@ export async function placeOrder(
       id: randomUUID(),
       userId,
       amount: pointsAwarded,
-      reason: "نقاط عن طلب جديد",
+      reason: "Points gagnés sur une commande",
       orderId,
     });
 

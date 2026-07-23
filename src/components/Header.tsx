@@ -15,10 +15,10 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-canvas/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
         <Link
           href="/"
-          className="font-display text-2xl uppercase tracking-widest text-ink"
+          className="font-display text-[26px] font-900 uppercase tracking-[0.08em] text-ink"
         >
           {SITE_NAME}
           <span className="text-accent">.</span>
@@ -26,7 +26,7 @@ export function Header({
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-ink-muted sm:flex">
           <Link href="/shop" className="transition hover:text-ink">
-            المتجر
+            Boutique
           </Link>
         </nav>
 
@@ -34,24 +34,24 @@ export function Header({
           {isLoggedIn ? (
             <Link
               href="/account"
-              className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink-muted transition hover:border-accent hover:text-ink sm:flex"
+              className="hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:border-silver hover:text-ink sm:flex"
             >
               <span className="text-accent">●</span>
-              {points ?? 0} نقطة
+              <span className="font-mono">{points ?? 0}</span> pts
             </Link>
           ) : (
             <Link
               href="/login"
               className="hidden text-sm font-medium text-ink-muted transition hover:text-ink sm:block"
             >
-              تسجيل الدخول
+              Connexion
             </Link>
           )}
 
           <Link
             href="/cart"
-            aria-label={`السلة، ${totalItems} قطعة`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink transition hover:border-accent"
+            aria-label={`Panier, ${totalItems} article${totalItems > 1 ? "s" : ""}`}
+            className="relative flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink transition hover:border-silver"
           >
             <svg
               width="16"
@@ -67,7 +67,7 @@ export function Header({
               <circle cx="18" cy="21" r="1.4" fill="currentColor" stroke="none" />
             </svg>
             {totalItems > 0 && (
-              <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-ink">
+              <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 font-mono text-[10px] font-bold text-ink">
                 {totalItems}
               </span>
             )}

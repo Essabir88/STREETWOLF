@@ -17,11 +17,11 @@ export function pointsToDiscountCents(points: number) {
   return points * MAD_CENTS_PER_POINT;
 }
 
-/** Formats a price stored as integer centimes into a Moroccan Dirham string. */
+/** Formats a price stored in centimes as a French-Moroccan dirham string. */
 export function formatPrice(cents: number) {
-  const value = (cents / 100).toLocaleString("ar-MA", {
+  const value = (cents / 100).toLocaleString("fr-MA", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  return `${value} درهم`;
+  return `${value} DH`;
 }

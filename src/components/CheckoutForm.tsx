@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "./CartContext";
 import { formatPrice, pointsToDiscountCents, REDEEM_STEP } from "@/lib/points";
 import { PAYMENT_METHODS } from "@/lib/payments";
+import { buildOrderWhatsAppLink } from "@/lib/whatsapp";
 
 export function CheckoutForm({
   userPoints,
@@ -34,9 +35,9 @@ export function CheckoutForm({
   if (items.length === 0) {
     return (
       <p className="mt-8 text-ink-muted">
-        السلة فارغة.{" "}
+        Votre panier est vide.{" "}
         <a href="/shop" className="text-ink underline">
-          تصفّح المتجر
+          Voir la boutique
         </a>
       </p>
     );
@@ -61,11 +62,37 @@ export function CheckoutForm({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "تعذر إتمام الطلب");
+      if (!res.ok) throw new Error(data.error || "Commande impossible");
+
+      // Straight to WhatsApp with the full order summary prefilled, so the
+      // customer confirms in one conversation. The order is already saved in
+      // the database at this point — WhatsApp is the confirmation channel,
+      // not the source of truth. Falls back to the order page when no
+      // WhatsApp number is configured.
+      const waLink = buildOrderWhatsAppLink({
+        orderId: data.orderId,
+        items: items.map((i) => ({
+          productName: i.name,
+          size: i.size,
+          quantity: i.quantity,
+          priceCents: i.priceCents,
+        })),
+        totalCents: data.totalCents,
+        discountCents: data.discountCents,
+        shippingName: name,
+        shippingPhone: phone,
+        shippingAddress: address,
+        shippingCity: city,
+      });
+
       clearCart();
-      router.push(`/order/${data.orderId}`);
+      if (waLink) {
+        window.location.assign(waLink);
+      } else {
+        router.push(`/order/${data.orderId}`);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "حدث خطأ");
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setSubmitting(false);
     }
@@ -74,47 +101,51 @@ export function CheckoutForm({
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-8">
       <div className="space-y-4">
-        <h2 className="font-display text-lg uppercase tracking-wide text-ink">معلومات التوصيل</h2>
+        <h2 className="font-display text-xl font-700 uppercase tracking-[0.04em] text-ink">
+          Livraison
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <input
             required
-            placeholder="الاسم الكامل"
+            placeholder="Nom complet"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="rounded-md border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-accent sm:col-span-2"
+            className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver sm:col-span-2"
           />
           <input
             required
-            placeholder="رقم الهاتف"
+            placeholder="Téléphone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="rounded-md border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-accent"
+            className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver"
           />
           <input
             required
-            placeholder="المدينة"
+            placeholder="Ville"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="rounded-md border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-accent"
+            className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver"
           />
           <textarea
             required
-            placeholder="العنوان الكامل"
+            placeholder="Adresse complète"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             rows={3}
-            className="rounded-md border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-accent sm:col-span-2"
+            className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver sm:col-span-2"
           />
         </div>
       </div>
 
       <div className="space-y-3">
-        <h2 className="font-display text-lg uppercase tracking-wide text-ink">طريقة الدفع</h2>
+        <h2 className="font-display text-xl font-700 uppercase tracking-[0.04em] text-ink">
+          Paiement
+        </h2>
         {PAYMENT_METHODS.map((method) => (
           <label
             key={method.id}
-            className={`flex items-start gap-3 rounded-md border p-4 ${
-              method.available ? "border-accent/50 bg-accent-soft" : "border-line opacity-50"
+            className={`edition-plate flex items-start gap-3 p-4 ${
+              method.available ? "border-accent/40 bg-accent-soft" : "opacity-50"
             }`}
           >
             <input
@@ -127,9 +158,11 @@ export function CheckoutForm({
             <span>
               <span className="block text-ink">
                 {method.label}
-                {!method.available && " (قريباً)"}
+                {!method.available && " (bientôt)"}
               </span>
-              <span className="block text-sm text-ink-muted">{method.description}</span>
+              <span className="block text-sm text-ink-muted">
+                {method.description}
+              </span>
             </span>
           </label>
         ))}
@@ -137,9 +170,12 @@ export function CheckoutForm({
 
       {userPoints > 0 && (
         <div className="space-y-3">
-          <h2 className="font-display text-lg uppercase tracking-wide text-ink">استبدال النقاط</h2>
+          <h2 className="font-display text-xl font-700 uppercase tracking-[0.04em] text-ink">
+            Utiliser mes points
+          </h2>
           <p className="text-sm text-ink-muted">
-            رصيدك: <span className="font-mono text-ink">{userPoints}</span> نقطة
+            Votre solde : <span className="font-mono text-ink">{userPoints}</span>{" "}
+            points
           </p>
           {maxRedeemSteps > 0 ? (
             <div className="flex items-center gap-4">
@@ -151,29 +187,31 @@ export function CheckoutForm({
                 onChange={(e) => setRedeemSteps(Number(e.target.value))}
                 className="flex-1 accent-[#c81e3a]"
               />
-              <span className="w-40 shrink-0 font-mono text-sm text-ink">
-                {pointsToRedeem} نقطة = -{formatPrice(discountCents)}
+              <span className="w-44 shrink-0 font-mono text-sm text-ink">
+                {pointsToRedeem} pts = −{formatPrice(discountCents)}
               </span>
             </div>
           ) : (
-            <p className="text-sm text-ink-faint">تحتاج {REDEEM_STEP} نقطة على الأقل للاستبدال.</p>
+            <p className="text-sm text-ink-faint">
+              Il faut au moins {REDEEM_STEP} points pour échanger.
+            </p>
           )}
         </div>
       )}
 
       <div className="space-y-2 border-t border-line pt-6">
         <div className="flex justify-between text-ink-muted">
-          <span>المجموع الفرعي</span>
+          <span>Sous-total</span>
           <span className="font-mono">{formatPrice(totalCents)}</span>
         </div>
         {discountCents > 0 && (
           <div className="flex justify-between text-accent">
-            <span>خصم النقاط</span>
-            <span className="font-mono">-{formatPrice(discountCents)}</span>
+            <span>Réduction points</span>
+            <span className="font-mono">−{formatPrice(discountCents)}</span>
           </div>
         )}
         <div className="flex justify-between text-lg text-ink">
-          <span>الإجمالي (يُدفع عند الاستلام)</span>
+          <span>Total (à payer à la livraison)</span>
           <span className="font-mono">{formatPrice(finalTotal)}</span>
         </div>
       </div>
@@ -183,10 +221,14 @@ export function CheckoutForm({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-md bg-accent px-6 py-4 font-display uppercase tracking-widest text-ink transition hover:opacity-90 disabled:opacity-50"
+        className="w-full bg-accent px-6 py-4 font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90 disabled:opacity-50"
       >
-        {submitting ? "جارٍ التأكيد..." : "تأكيد الطلب"}
+        {submitting ? "Confirmation..." : "Confirmer la commande"}
       </button>
+      <p className="text-center text-sm text-ink-faint">
+        Après confirmation, vous serez redirigé vers WhatsApp avec le détail de
+        votre commande pour la valider avec nous.
+      </p>
     </form>
   );
 }

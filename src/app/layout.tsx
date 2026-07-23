@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
-// Self-hosted fonts (no build-time fetch to Google's servers required —
-// safer for CI/sandboxed environments with restricted network egress).
-import "@fontsource/anton";
-import "@fontsource/cairo/400.css";
-import "@fontsource/cairo/500.css";
-import "@fontsource/cairo/600.css";
-import "@fontsource/cairo/700.css";
-import "@fontsource/cairo/800.css";
+// Self-hosted fonts (no build-time fetch to Google's servers required).
+import "@fontsource/big-shoulders-display/500";
+import "@fontsource/big-shoulders-display/700";
+import "@fontsource/big-shoulders-display/900";
+import "@fontsource/space-grotesk/400.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/700.css";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "@fontsource/jetbrains-mono/700.css";
@@ -21,7 +20,7 @@ import { users } from "@/db/schema";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} — Street Wolf`,
+  title: `${SITE_NAME} — Rule the Streets`,
   description: SITE_DESCRIPTION,
 };
 
@@ -42,7 +41,7 @@ export default async function RootLayout({
   const { isLoggedIn, points } = await getHeaderData();
 
   return (
-    <html lang="ar" dir="rtl" className="h-full">
+    <html lang="fr" className="h-full">
       <body className="flex min-h-full flex-col font-body antialiased">
         <CartProvider>
           <Header isLoggedIn={isLoggedIn} points={points} />

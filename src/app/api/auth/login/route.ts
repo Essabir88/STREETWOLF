@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "بيانات غير صالحة" },
+      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
       { status: 400 }
     );
   }
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   // caller can't use this endpoint to discover which emails are registered.
   const invalid = () =>
     NextResponse.json(
-      { error: "البريد الإلكتروني أو كلمة السر غير صحيحة." },
+      { error: "E-mail ou mot de passe incorrect." },
       { status: 401 }
     );
 

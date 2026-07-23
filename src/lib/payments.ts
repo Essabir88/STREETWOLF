@@ -12,8 +12,9 @@ export const PAYMENT_METHODS: {
 }[] = [
   {
     id: "cod",
-    label: "الدفع عند الاستلام",
-    description: "تدفع نقداً للمندوب عند وصول الطلب. بدون أي حساب أو رسوم إضافية.",
+    label: "Paiement à la livraison",
+    description:
+      "Payez en espèces au livreur à la réception. Aucun compte, aucuns frais supplémentaires.",
     available: true,
   },
 ];

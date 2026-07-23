@@ -6,14 +6,14 @@ import { placeOrder, CheckoutError } from "@/lib/orders";
 export async function POST(request: Request) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "يجب تسجيل الدخول أولاً." }, { status: 401 });
+    return NextResponse.json({ error: "Connectez-vous pour commander." }, { status: 401 });
   }
 
   const body = await request.json().catch(() => null);
   const parsed = checkoutSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "بيانات غير صالحة" },
+      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
       { status: 400 }
     );
   }
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
     console.error(err);
     return NextResponse.json(
-      { error: "تعذر إتمام الطلب. حاول مرة أخرى." },
+      { error: "Impossible de finaliser la commande. Réessayez." },
       { status: 500 }
     );
   }

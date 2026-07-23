@@ -20,7 +20,10 @@ export default async function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-16">
-      <h1 className="font-display text-3xl uppercase tracking-wide text-ink">إتمام الشراء</h1>
+      <div className="claw-divider mb-4" />
+      <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
+        Finaliser ma commande
+      </h1>
       <CheckoutForm
         userPoints={user.points}
         defaultName={user.name ?? ""}

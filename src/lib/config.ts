@@ -2,5 +2,5 @@
 export const SITE_NAME = "Street Wolf";
 export const SITE_TAGLINE = "Rule the Streets";
 export const SITE_DESCRIPTION =
-  "قطع محدودة، بقصة خاصة. كل نسخة مرقّمة، وما يفوتك ما يرجعش.";
-export const CURRENCY_LABEL = "درهم مغربي";
+  "Éditions limitées, chaque pièce a son histoire. Quand c'est épuisé, ça ne revient pas.";
+export const CURRENCY_LABEL = "dirhams";

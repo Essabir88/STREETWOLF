@@ -1,38 +1,27 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
-  const [next, setNext] = useState("/account");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // Reading location.search has to happen after mount (see CartContext.tsx
-  // for why this can’t move into a lazy useState initializer).
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNext(params.get("next") || "/account");
-  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Connexion impossible");
-      router.push(next);
+      router.push("/admin");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
@@ -45,21 +34,13 @@ export default function LoginPage() {
     <div className="mx-auto max-w-md px-5 py-20">
       <div className="claw-divider mb-4" />
       <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-        Connexion
+        Espace admin
       </h1>
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm text-ink-muted">E-mail</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver"
-          />
-        </div>
-        <div>
-          <label className="mb-1.5 block text-sm text-ink-muted">Mot de passe</label>
+          <label className="mb-1.5 block text-sm text-ink-muted">
+            Mot de passe admin
+          </label>
           <input
             type="password"
             required
@@ -74,15 +55,9 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full bg-accent px-6 py-3 font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? "..." : "Se connecter"}
+          {loading ? "..." : "Entrer"}
         </button>
       </form>
-      <p className="mt-6 text-sm text-ink-muted">
-        Pas encore de compte ?{" "}
-        <Link href="/register" className="text-ink underline">
-          Créer un compte
-        </Link>
-      </p>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { ProductCard } from "@/components/ProductCard";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "المتجر — Street Wolf" };
+export const metadata = { title: "Boutique — Street Wolf" };
 
 export default async function ShopPage() {
   const products = await getActiveProducts();
@@ -12,14 +12,17 @@ export default async function ShopPage() {
     <div className="mx-auto max-w-6xl px-5 py-16">
       <div className="mb-10">
         <div className="claw-divider mb-4" />
-        <h1 className="font-display text-4xl uppercase tracking-wide text-ink">المتجر</h1>
+        <h1 className="font-display text-5xl font-700 uppercase tracking-[0.04em] text-ink">
+          Boutique
+        </h1>
         <p className="mt-2 text-ink-muted">
-          كل القطع المتوفرة حالياً. إصدارات محدودة — حين تنفد، لا تعود.
+          Toutes les pièces disponibles. Éditions limitées — épuisé, c’est
+          définitif.
         </p>
       </div>
 
       {products.length === 0 ? (
-        <p className="text-ink-muted">لا توجد منتجات متاحة حالياً.</p>
+        <p className="text-ink-muted">Aucun produit disponible pour le moment.</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (

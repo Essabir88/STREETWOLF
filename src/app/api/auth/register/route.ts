@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "بيانات غير صالحة" },
+      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
       { status: 400 }
     );
   }
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     .limit(1);
   if (existing) {
     return NextResponse.json(
-      { error: "هذا البريد الإلكتروني مستخدم من قبل." },
+      { error: "Cette adresse e-mail est déjà utilisée." },
       { status: 409 }
     );
   }

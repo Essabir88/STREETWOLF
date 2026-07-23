@@ -1,10 +1,13 @@
 /**
  * Seeds example products so the store isn't empty on first run.
  *
- * These three products use the real artwork/photos supplied for this
- * project (see /public/products). The story copy is illustrative — replace
- * it with the brand's real storytelling before launch. Run with:
- *   npm run db:seed
+ * Uses the real artwork/photos supplied for this project (/public/products).
+ * The story copy is illustrative — replace it with the brand's real
+ * storytelling before launch. Run with:  npm run db:seed
+ *
+ * Upsert behaviour: if a product with the same slug already exists (e.g. the
+ * earlier Arabic-seeded rows), its text fields are UPDATED to this content,
+ * but stock counters are left untouched so live sales are never reset.
  */
 import "dotenv/config";
 import { randomUUID } from "crypto";
@@ -14,13 +17,13 @@ import { products } from "./schema";
 const seedProducts = [
   {
     slug: "circle-logo",
-    name: "الشعار الدائري",
-    tagline: "القمر يشهد. الذئب لا ينام.",
-    story: `في الأحياء التي تغفو المدينة فيها، هناك ذئب لا ينام.
+    name: "Circle Logo",
+    tagline: "La lune regarde. Le loup ne dort pas.",
+    story: `Dans les quartiers où la ville s'endort, il y a un loup qui ne dort jamais.
 
-هذا التيشورت هو أول قطعة في مجموعة Street Wolf. الشعار الدائري في المنتصف ليس مجرد رسم — إنه القمر الذي يشهد على من يبقى مستيقظاً بعدما ينام الجميع.
+Ce t-shirt est la première pièce de la collection Street Wolf. Le logo circulaire au centre n'est pas un simple dessin — c'est la lune, témoin de ceux qui restent debout quand tout le monde dort.
 
-100 نسخة لا غير، كل واحدة مرقّمة. من يرتديه لا ينتمي إلى الحشد، بل إلى دائرة صغيرة تعرف قيمة الليل.`,
+100 exemplaires, pas un de plus. Le porter, ce n'est pas appartenir à la foule : c'est appartenir à un petit cercle qui connaît la valeur de la nuit.`,
     priceCents: 27900,
     images: [
       "/products/circle-logo-1.jpg",
@@ -32,13 +35,13 @@ const seedProducts = [
   },
   {
     slug: "jersey-23",
-    name: "جيرسي 23",
-    tagline: "روح الشارع، بمقاس فضفاض.",
-    story: `الرقم 23 ليس مصادفة. هو عدد الأحياء التي انطلقت منها فكرة Street Wolf الأولى، قبل أن تصبح ماركة.
+    name: "Jersey 23",
+    tagline: "L'esprit de la rue, en coupe oversize.",
+    story: `Le numéro 23 n'est pas un hasard. C'est le nombre de quartiers d'où est partie la première idée de Street Wolf, avant qu'elle ne devienne une marque.
 
-قصة هذا التيشورت الأبيض الفضفاض بخطوط الأكمام السوداء: طبعة رياضية ثقيلة (varsity)، لكن بروح الشارع لا الملعب. صُمم ليُلبس فضفاضاً، وليُرى من بعيد.
+Ce t-shirt blanc oversize aux rayures noires sur les manches : une coupe varsity lourde, mais avec l'esprit de la rue, pas du stade. Fait pour être porté ample, et pour être vu de loin.
 
-إصدار محدود بـ 60 نسخة.`,
+Édition limitée à 60 exemplaires.`,
     priceCents: 34900,
     images: [
       "/products/jersey-23-1.jpg",
@@ -50,13 +53,13 @@ const seedProducts = [
   },
   {
     slug: "roar-mode",
-    name: "روار مود",
-    tagline: "الغضب له شكل.",
-    story: `أحياناً القصة لا تُحكى — بل تُصرَخ.
+    name: "Roar Mode",
+    tagline: "La rage a un visage.",
+    story: `Parfois, l'histoire ne se raconte pas — elle se hurle.
 
-"روار مود" هو أعنف تصميم أصدرته Street Wolf: وجه ذئب هائج، محاصر داخل إطار، كأنه يحاول الخروج منه. صُمم لمن يحمل ضغطاً ويحتاج أن يقوله بدون أن يهدر كلمة واحدة.
+« Roar Mode » est le design le plus brut jamais sorti par Street Wolf : un loup enragé, enfermé dans un cadre, comme s'il essayait d'en sortir. Fait pour ceux qui portent une pression et veulent la dire sans gaspiller un seul mot.
 
-كانت الكمية 40 نسخة فقط — ونفدت بالكامل.`,
+Le tirage était de 40 exemplaires — tout est parti.`,
     priceCents: 25900,
     images: ["/products/roar-mode-1.jpg"],
     totalStock: 40,
@@ -80,10 +83,21 @@ async function main() {
         stockRemaining: p.stockRemaining,
         active: true,
       })
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: products.slug,
+        // Deliberately NOT updating stockRemaining/totalStock: if real sales
+        // have already happened, re-seeding must never resurrect sold stock.
+        set: {
+          name: p.name,
+          tagline: p.tagline,
+          story: p.story,
+          priceCents: p.priceCents,
+          images: JSON.stringify(p.images),
+        },
+      });
   }
   console.log(
-    `Seeded ${seedProducts.length} products (skips ones that already exist by slug).`
+    `Seeded/updated ${seedProducts.length} products (existing stock counters preserved).`
   );
 }
 

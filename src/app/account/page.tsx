@@ -9,9 +9,10 @@ import { formatPrice, pointsToDiscountCents, REDEEM_STEP } from "@/lib/points";
 export const dynamic = "force-dynamic";
 
 function statusLabel(status: string) {
-  if (status === "pending") return "قيد المعالجة";
-  if (status === "confirmed") return "مؤكد";
-  if (status === "cancelled") return "ملغى";
+  if (status === "pending") return "En traitement";
+  if (status === "confirmed") return "Confirmée";
+  if (status === "fulfilled") return "Livrée";
+  if (status === "cancelled") return "Annulée";
   return status;
 }
 
@@ -40,21 +41,30 @@ export default async function AccountPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-16">
-      <h1 className="font-display text-3xl uppercase tracking-wide text-ink">حسابي</h1>
+      <div className="claw-divider mb-4" />
+      <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
+        Mon compte
+      </h1>
       <p className="mt-1 text-ink-muted">{user.email}</p>
 
-      <div className="mt-8 rounded-md border border-accent/40 bg-accent-soft p-6">
-        <p className="text-sm text-ink-muted">رصيد النقاط</p>
+      <div className="edition-plate mt-8 border-accent/40 bg-accent-soft p-6">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
+          Solde de points
+        </p>
         <p className="mt-1 font-mono text-4xl text-ink">{user.points}</p>
         <p className="mt-2 text-sm text-ink-muted">
-          كل {REDEEM_STEP} نقطة تُستبدل بخصم {formatPrice(pointsToDiscountCents(REDEEM_STEP))} عند الدفع.
+          Chaque tranche de {REDEEM_STEP} points ={" "}
+          {formatPrice(pointsToDiscountCents(REDEEM_STEP))} de réduction au
+          paiement.
         </p>
       </div>
 
       <section className="mt-12">
-        <h2 className="font-display text-xl uppercase tracking-wide text-ink">الطلبات</h2>
+        <h2 className="font-display text-2xl font-700 uppercase tracking-[0.04em] text-ink">
+          Mes commandes
+        </h2>
         {myOrders.length === 0 ? (
-          <p className="mt-3 text-ink-muted">لا توجد طلبات بعد.</p>
+          <p className="mt-3 text-ink-muted">Aucune commande pour l’instant.</p>
         ) : (
           <div className="mt-4 divide-y divide-line border-y border-line">
             {myOrders.map((o) => (
@@ -66,10 +76,10 @@ export default async function AccountPage() {
                 <div>
                   <p className="font-mono text-ink">#{o.id.slice(0, 8)}</p>
                   <p className="text-sm text-ink-faint">
-                    {new Date(o.createdAt).toLocaleDateString("ar-MA")}
+                    {new Date(o.createdAt).toLocaleDateString("fr-MA")}
                   </p>
                 </div>
-                <div className="text-left">
+                <div className="text-right">
                   <p className="font-mono text-ink">{formatPrice(o.totalCents)}</p>
                   <p className="text-sm text-ink-faint">{statusLabel(o.status)}</p>
                 </div>
@@ -79,16 +89,23 @@ export default async function AccountPage() {
         )}
       </section>
 
-      <section className="mt-12 mb-16">
-        <h2 className="font-display text-xl uppercase tracking-wide text-ink">سجل النقاط</h2>
+      <section className="mb-16 mt-12">
+        <h2 className="font-display text-2xl font-700 uppercase tracking-[0.04em] text-ink">
+          Historique des points
+        </h2>
         {ledger.length === 0 ? (
-          <p className="mt-3 text-ink-muted">لا يوجد سجل بعد.</p>
+          <p className="mt-3 text-ink-muted">Aucun mouvement pour l’instant.</p>
         ) : (
           <div className="mt-4 divide-y divide-line border-y border-line">
             {ledger.map((t) => (
-              <div key={t.id} className="flex items-center justify-between py-3 text-sm">
+              <div
+                key={t.id}
+                className="flex items-center justify-between py-3 text-sm"
+              >
                 <span className="text-ink-muted">{t.reason}</span>
-                <span className={`font-mono ${t.amount >= 0 ? "text-ink" : "text-accent"}`}>
+                <span
+                  className={`font-mono ${t.amount >= 0 ? "text-silver" : "text-accent"}`}
+                >
                   {t.amount >= 0 ? "+" : ""}
                   {t.amount}
                 </span>
