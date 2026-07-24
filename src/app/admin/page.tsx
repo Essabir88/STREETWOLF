@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { orders, products } from "@/db/schema";
 import { AdminOrderRow } from "@/components/AdminOrderRow";
 import { formatPrice } from "@/lib/points";
+import { resolveLocalized } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,7 @@ export default async function AdminPage() {
           <div className="mt-1 space-y-0.5 text-sm">
             {stock.map((s) => (
               <p key={s.slug} className="text-ink-muted">
-                {s.name} :{" "}
+                {resolveLocalized(s.name, "fr")} :{" "}
                 <span className="font-mono text-ink">
                   {s.stockRemaining}/{s.totalStock}
                 </span>

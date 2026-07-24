@@ -1,31 +1,45 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getProductBySlug } from "@/lib/products";
 import { EditionBadge } from "@/components/EditionBadge";
 import { AddToCartForm } from "@/components/AddToCartForm";
 import { formatPrice } from "@/lib/points";
+import type { Locale } from "@/i18n/routing";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: Locale }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const { slug, locale } = await params;
+  const t = await getTranslations({ locale, namespace: "product" });
+  const product = await getProductBySlug(slug, locale);
+  if (!product) {
+    return { title: t("notFound") };
+  }
   return {
-    title: product ? `${product.name} — Street Wolf` : "Produit introuvable",
+    title: `${product.name} — Street Wolf`,
+    description: product.tagline,
+    openGraph: {
+      title: `${product.name} — Street Wolf`,
+      description: product.tagline,
+      images: product.images[0] ? [{ url: product.images[0] }] : undefined,
+    },
   };
 }
 
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: Locale }>;
 }) {
-  const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const { slug, locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("product");
+  const product = await getProductBySlug(slug, locale);
   if (!product) notFound();
 
   const storyParagraphs = product.story.split(/\n\s*\n/).filter(Boolean);
@@ -67,7 +81,7 @@ export default async function ProductPage({
           </h1>
           <p className="mt-3 text-ink-muted">{product.tagline}</p>
           <p className="mt-5 font-mono text-3xl text-ink">
-            {formatPrice(product.priceCents)}
+            {formatPrice(product.priceCents, locale)}
           </p>
           <div className="edition-plate mt-5 p-4">
             <EditionBadge
@@ -94,7 +108,7 @@ export default async function ProductPage({
       <div className="mx-auto mt-20 max-w-2xl border-t border-line pt-12">
         <div className="claw-divider mb-4" />
         <h2 className="font-display text-3xl font-700 uppercase tracking-[0.04em] text-ink">
-          L’histoire
+          {t("story")}
         </h2>
         <div className="mt-4 space-y-4 leading-8 text-ink-muted">
           {storyParagraphs.map((para, i) => (

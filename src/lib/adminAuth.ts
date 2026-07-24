@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { timingSafeEqual } from "crypto";
 
 // Admin access is a single shared password set via the ADMIN_PASSWORD env
 // var — deliberately simple for a one-person store. If ADMIN_PASSWORD is not
@@ -16,17 +17,22 @@ export function adminPasswordConfigured() {
   return Boolean(process.env.ADMIN_PASSWORD);
 }
 
+const PASSWORD_COMPARE_BUFFER_SIZE = 256;
+
 export function checkAdminPassword(password: string) {
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) return false;
-  // Constant-time-ish comparison; for a single low-value shared secret this
-  // is acceptable. Rotate by changing the env var.
-  if (password.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i++) {
-    diff |= password.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0;
+  // Real constant-time comparison: pad both sides to a fixed size *before*
+  // comparing, so timingSafeEqual (which throws on mismatched buffer
+  // lengths) always receives equal-length buffers. This avoids leaking the
+  // expected password's length through an early return, unlike a naive
+  // `if (password.length !== expected.length) return false` guard.
+  const a = Buffer.alloc(PASSWORD_COMPARE_BUFFER_SIZE);
+  const b = Buffer.alloc(PASSWORD_COMPARE_BUFFER_SIZE);
+  a.write(password.slice(0, PASSWORD_COMPARE_BUFFER_SIZE), "utf8");
+  b.write(expected.slice(0, PASSWORD_COMPARE_BUFFER_SIZE), "utf8");
+  const contentMatches = timingSafeEqual(a, b);
+  return contentMatches && password.length === expected.length;
 }
 
 export async function createAdminToken() {

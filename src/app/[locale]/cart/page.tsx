@@ -1,26 +1,30 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/CartContext";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { formatPrice } from "@/lib/points";
+import type { Locale } from "@/i18n/routing";
 
 export default function CartPage() {
+  const t = useTranslations("cart");
+  const locale = useLocale() as Locale;
   const { items, updateQuantity, removeItem, totalCents } = useCart();
 
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-24 text-center">
         <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-          Panier vide
+          {t("empty.title")}
         </h1>
-        <p className="mt-3 text-ink-muted">Vous n’avez encore rien ajouté.</p>
+        <p className="mt-3 text-ink-muted">{t("empty.subtitle")}</p>
         <Link
           href="/shop"
           className="mt-6 inline-block bg-accent px-6 py-3 font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90"
         >
-          Voir la boutique
+          {t("empty.viewShop")}
         </Link>
       </div>
     );
@@ -29,7 +33,7 @@ export default function CartPage() {
   return (
     <div className="mx-auto max-w-4xl px-5 py-16">
       <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-        Panier
+        {t("title")}
       </h1>
 
       <div className="mt-8 divide-y divide-line border-y border-line">
@@ -47,11 +51,13 @@ export default function CartPage() {
                     {item.name}
                   </p>
                   {item.size && (
-                    <p className="text-sm text-ink-faint">Taille : {item.size}</p>
+                    <p className="text-sm text-ink-faint">
+                      {t("size", { size: item.size })}
+                    </p>
                   )}
                 </div>
                 <p className="font-mono text-ink">
-                  {formatPrice(item.priceCents * item.quantity)}
+                  {formatPrice(item.priceCents * item.quantity, locale)}
                 </p>
               </div>
               <div className="flex items-center justify-between">
@@ -65,7 +71,7 @@ export default function CartPage() {
                   onClick={() => removeItem(item.productId, item.size)}
                   className="text-sm text-ink-faint transition hover:text-accent"
                 >
-                  Retirer
+                  {t("remove")}
                 </button>
               </div>
             </div>
@@ -74,15 +80,15 @@ export default function CartPage() {
       </div>
 
       <div className="mt-8 flex items-center justify-between">
-        <p className="text-ink-muted">Total</p>
-        <p className="font-mono text-2xl text-ink">{formatPrice(totalCents)}</p>
+        <p className="text-ink-muted">{t("total")}</p>
+        <p className="font-mono text-2xl text-ink">{formatPrice(totalCents, locale)}</p>
       </div>
 
       <Link
         href="/checkout"
         className="mt-6 block bg-accent px-6 py-4 text-center font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90"
       >
-        Passer commande
+        {t("checkout")}
       </Link>
     </div>
   );

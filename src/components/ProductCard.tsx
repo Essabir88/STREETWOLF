@@ -1,11 +1,15 @@
 import Image from "next/image";
-import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/points";
-import { ProductWithImages } from "@/lib/products";
+import { LocalizedProduct } from "@/lib/products";
 import { EditionBadge } from "./EditionBadge";
+import type { Locale } from "@/i18n/routing";
 
-export function ProductCard({ product }: { product: ProductWithImages }) {
+export async function ProductCard({ product }: { product: LocalizedProduct }) {
   const soldOut = product.stockRemaining <= 0;
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("product");
 
   return (
     <Link
@@ -27,7 +31,7 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
         {soldOut && (
           <div className="absolute inset-0 flex items-center justify-center bg-canvas/40">
             <span className="border border-ink/60 px-3 py-1 font-display text-base font-700 uppercase tracking-[0.2em] text-ink">
-              Épuisé
+              {t("soldOut")}
             </span>
           </div>
         )}
@@ -39,7 +43,7 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
             {product.name}
           </h3>
           <span className="whitespace-nowrap font-mono text-base text-ink">
-            {formatPrice(product.priceCents)}
+            {formatPrice(product.priceCents, locale)}
           </span>
         </div>
         <p className="text-sm text-ink-muted">{product.tagline}</p>

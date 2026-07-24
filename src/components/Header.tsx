@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useCart } from "./CartContext";
 import { SITE_NAME } from "@/lib/config";
 
@@ -12,6 +13,7 @@ export function Header({
   points: number | null;
 }) {
   const { totalItems } = useCart();
+  const t = useTranslations();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-canvas/90 backdrop-blur">
@@ -26,7 +28,7 @@ export function Header({
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-ink-muted sm:flex">
           <Link href="/shop" className="transition hover:text-ink">
-            Boutique
+            {t("nav.shop")}
           </Link>
         </nav>
 
@@ -44,13 +46,13 @@ export function Header({
               href="/login"
               className="hidden text-sm font-medium text-ink-muted transition hover:text-ink sm:block"
             >
-              Connexion
+              {t("nav.login")}
             </Link>
           )}
 
           <Link
             href="/cart"
-            aria-label={`Panier, ${totalItems} article${totalItems > 1 ? "s" : ""}`}
+            aria-label={t("cart.aria", { count: totalItems })}
             className="relative flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink transition hover:border-silver"
           >
             <svg

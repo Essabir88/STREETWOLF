@@ -1,0 +1,179 @@
+{
+  "nav": {
+    "shop": "المتجر",
+    "account": "حسابي",
+    "login": "تسجيل الدخول"
+  },
+  "cart": {
+    "aria": "{count, plural, zero {السلة، لا عناصر} one {السلة، عنصر واحد} two {السلة، عنصران} few {السلة، # عناصر} many {السلة، # عنصراً} other {السلة، # عنصر}}",
+    "empty": {
+      "title": "السلة فارغة",
+      "subtitle": "لم تضف أي شيء بعد.",
+      "viewShop": "تصفح المتجر"
+    },
+    "title": "السلة",
+    "size": "المقاس: {size}",
+    "remove": "إزالة",
+    "total": "المجموع",
+    "checkout": "إتمام الطلب"
+  },
+  "home": {
+    "marquee": "RULE THE STREETS — نسخ محدودة — الدار البيضاء — لكل قطعة قصتها — ",
+    "heroSubtitle": "نسخ محدودة ومرقّمة. لكل قطعة قصتها — وحين تنفد، لا تعود.",
+    "seeDrops": "شاهد الإصدارات",
+    "currentDrops": "الإصدارات الحالية",
+    "viewAll": "كل المجموعة ←",
+    "noProducts": "لا توجد منتجات بعد. شغّل <command>npm run db:seed</command> لإضافة منتجات تجريبية.",
+    "collectionTitle": "كل قطعة، نسخة محدودة",
+    "featureHistoryTitle": "قصة —",
+    "featureHistoryBody": "لكل تصميم سبب وجود، تُروى بالكامل في صفحته.",
+    "featureNumberedTitle": "تصميم مرقّم —",
+    "featureNumberedBody": "لكل إصدار عدد ثابت من القطع. حين ينفد، ينتهي نهائياً.",
+    "featurePointsTitle": "نقاط الولاء —",
+    "featurePointsBody": "كل عملية شراء تضيف نقاطاً إلى حسابك، قابلة للاستبدال بخصم على طلباتك القادمة."
+  },
+  "shop": {
+    "title": "المتجر",
+    "subtitle": "كل القطع المتوفرة. نسخ محدودة — حين تنفد، ينتهي الأمر نهائياً.",
+    "empty": "لا توجد منتجات متوفرة حالياً."
+  },
+  "product": {
+    "notFound": "المنتج غير موجود",
+    "story": "القصة",
+    "soldOut": "نفدت الكمية",
+    "soldOutNotice": "نفدت هذه النسخة بالكامل. تابعنا لمعرفة الإصدار القادم.",
+    "size": "المقاس",
+    "quantity": "الكمية",
+    "addToCart": "أضف إلى السلة — {price}",
+    "added": "أُضيف ✓ — عرض السلة"
+  },
+  "edition": {
+    "limited": "نسخة محدودة",
+    "soldOutCount": "{total}/{total} — نفدت الكمية",
+    "remaining": "تبقّى {remaining}/{total}",
+    "soldOutAria": "نفدت كمية هذه النسخة",
+    "percentSoldAria": "تم بيع {percent}% من هذه النسخة"
+  },
+  "quantityStepper": {
+    "decrease": "إنقاص الكمية",
+    "increase": "زيادة الكمية"
+  },
+  "checkout": {
+    "pageTitle": "إتمام طلبي",
+    "shippingTitle": "التوصيل",
+    "namePlaceholder": "الاسم الكامل",
+    "phonePlaceholder": "الهاتف",
+    "cityPlaceholder": "المدينة",
+    "addressPlaceholder": "العنوان الكامل",
+    "paymentTitle": "الدفع",
+    "paymentComingSoon": "(قريباً)",
+    "payment": {
+      "cod": {
+        "label": "الدفع عند الاستلام",
+        "description": "ادفع نقداً للموصّل عند الاستلام. بدون حساب، بدون رسوم إضافية."
+      }
+    },
+    "pointsTitle": "استخدام نقاطي",
+    "pointsBalance": "رصيدك: {points} نقطة",
+    "pointsRedeem": "{points} نقطة = −{amount}",
+    "pointsMinNotice": "يلزم {step} نقطة على الأقل للاستبدال.",
+    "subtotal": "المجموع الفرعي",
+    "discount": "خصم النقاط",
+    "total": "المجموع (يُدفع عند التسليم)",
+    "submitting": "جارٍ التأكيد...",
+    "submit": "تأكيد الطلب",
+    "whatsappNotice": "بعد التأكيد، سيتم توجيهك إلى واتساب مع تفاصيل طلبك لتأكيده معنا.",
+    "empty": "سلتك فارغة.",
+    "viewShop": "تصفح المتجر",
+    "errors": {
+      "user_not_found": "المستخدم غير موجود.",
+      "invalid_redeem_step": "تُستبدل النقاط بمضاعفات {step}.",
+      "insufficient_points": "رصيد النقاط غير كافٍ لهذا الاستبدال.",
+      "product_unavailable": "أحد عناصر السلة لم يعد متوفراً.",
+      "insufficient_stock": "تبقّى {remaining} قطعة فقط من هذا العنصر.",
+      "cart_empty": "السلة فارغة.",
+      "unauthenticated": "سجّل الدخول لإتمام الطلب.",
+      "rate_limited": "محاولات كثيرة جداً. أعد المحاولة بعد بضع دقائق.",
+      "server_error": "تعذّر إتمام الطلب. أعد المحاولة.",
+      "generic": "تعذّر إتمام الطلب"
+    }
+  },
+  "validation": {
+    "invalid_email": "عنوان بريد إلكتروني غير صالح",
+    "password_too_short": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+    "password_required": "أدخل كلمة المرور",
+    "name_too_short": "الاسم قصير جداً",
+    "phone_invalid": "رقم هاتف غير صالح",
+    "address_too_short": "العنوان قصير جداً",
+    "city_required": "المدينة مطلوبة",
+    "cart_empty": "السلة فارغة",
+    "invalid_input": "بيانات غير صالحة"
+  },
+  "order": {
+    "title": "تم استلام طلبك",
+    "orderNumber": "رقم الطلب: {id}",
+    "confirmOnWhatsapp": "التأكيد عبر واتساب",
+    "sizeAndQty": "المقاس {size} × {quantity}",
+    "subtotal": "المجموع الفرعي",
+    "discount": "خصم النقاط",
+    "total": "المجموع (يُدفع عند التسليم)",
+    "pointsEarned": "ربحت {points} نقطة مع هذا الطلب.",
+    "shippingAddress": "عنوان التوصيل"
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "loading": "...",
+      "noAccount": "ليس لديك حساب بعد؟",
+      "createAccount": "إنشاء حساب"
+    },
+    "register": {
+      "title": "إنشاء حساب",
+      "name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف (اختياري)",
+      "password": "كلمة المرور (8 أحرف على الأقل)",
+      "submit": "إنشاء حسابي",
+      "loading": "...",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول"
+    },
+    "errors": {
+      "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      "email_taken": "هذا البريد الإلكتروني مستخدم بالفعل.",
+      "rate_limited": "محاولات كثيرة جداً. أعد المحاولة بعد بضع دقائق.",
+      "generic_login": "تعذّر تسجيل الدخول",
+      "generic_register": "تعذّر إنشاء الحساب"
+    }
+  },
+  "account": {
+    "title": "حسابي",
+    "pointsBalance": "رصيد النقاط",
+    "pointsRule": "كل {step} نقطة = خصم {amount} عند الدفع.",
+    "myOrders": "طلباتي",
+    "noOrders": "لا توجد طلبات بعد.",
+    "pointsHistory": "سجل النقاط",
+    "noPointsHistory": "لا توجد حركات بعد.",
+    "status": {
+      "pending": "قيد المعالجة",
+      "confirmed": "مؤكدة",
+      "fulfilled": "تم التسليم",
+      "cancelled": "ملغاة"
+    },
+    "pointsReason": {
+      "redeemed_at_checkout": "نقاط مُستبدلة عند الطلب",
+      "earned_on_order": "نقاط مكتسبة من طلب"
+    }
+  },
+  "footer": {
+    "tagline": "نسخ محدودة، لكل قطعة قصتها. حين تنفد الكمية، ينتهي الأمر.",
+    "rights": "جميع الحقوق محفوظة."
+  },
+  "metadata": {
+    "siteDescription": "نسخ محدودة، لكل قطعة قصتها. حين تنفد، لا تعود.",
+    "shopTitle": "المتجر — Street Wolf"
+  }
+}

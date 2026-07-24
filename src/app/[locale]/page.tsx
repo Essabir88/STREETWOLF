@@ -1,16 +1,23 @@
-import Link from "next/link";
 import Image from "next/image";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getActiveProducts } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
+import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
-const MARQUEE_ITEMS =
-  "RULE THE STREETS — ÉDITIONS LIMITÉES — CASABLANCA — CHAQUE PIÈCE A SON HISTOIRE — ";
-
-export default async function HomePage() {
-  const allProducts = await getActiveProducts();
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("home");
+  const allProducts = await getActiveProducts(locale);
   const featured = allProducts.slice(0, 3);
+  const marqueeItems = t("marquee");
 
   return (
     <>
@@ -31,15 +38,14 @@ export default async function HomePage() {
             Wolf
           </h1>
           <p className="hero-rise-late mt-5 max-w-xl text-lg text-ink-muted">
-            Éditions limitées et numérotées. Chaque pièce a son histoire —
-            quand c’est épuisé, ça ne revient pas.
+            {t("heroSubtitle")}
           </p>
           <div className="hero-rise-late mt-8">
             <Link
               href="/shop"
               className="inline-block bg-accent px-8 py-3.5 font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90"
             >
-              Voir les drops
+              {t("seeDrops")}
             </Link>
           </div>
         </div>
@@ -47,7 +53,7 @@ export default async function HomePage() {
 
       <div className="marquee py-2.5" aria-hidden="true">
         <div className="marquee-track font-display text-sm font-500 uppercase tracking-[0.3em] text-ink-faint">
-          {MARQUEE_ITEMS.repeat(3)}
+          {marqueeItems.repeat(3)}
         </div>
       </div>
 
@@ -56,22 +62,24 @@ export default async function HomePage() {
           <div>
             <div className="claw-divider mb-4" />
             <h2 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-              Les drops en cours
+              {t("currentDrops")}
             </h2>
           </div>
           <Link
             href="/shop"
             className="text-sm text-ink-muted transition hover:text-ink"
           >
-            Toute la collection →
+            {t("viewAll")}
           </Link>
         </div>
 
         {featured.length === 0 ? (
           <p className="text-ink-muted">
-            Aucun produit pour l’instant. Lancez{" "}
-            <code className="font-mono text-ink">npm run db:seed</code> pour
-            ajouter des exemples.
+            {t.rich("noProducts", {
+              command: (chunks) => (
+                <code className="font-mono text-ink">{chunks}</code>
+              ),
+            })}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,7 +95,7 @@ export default async function HomePage() {
           <div className="edition-plate relative aspect-[4/3] overflow-hidden">
             <Image
               src="/brand/collection-sheet-1.jpg"
-              alt="La collection Street Wolf"
+              alt="Street Wolf collection"
               fill
               className="object-cover"
             />
@@ -95,29 +103,26 @@ export default async function HomePage() {
           <div>
             <div className="claw-divider mb-4" />
             <h2 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-              Chaque pièce, une édition limitée
+              {t("collectionTitle")}
             </h2>
             <ul className="mt-6 space-y-5 text-ink-muted">
               <li>
                 <span className="font-display text-lg font-700 uppercase text-ink">
-                  Une histoire —{" "}
+                  {t("featureHistoryTitle")}{" "}
                 </span>
-                chaque design a une raison d’exister, racontée en entier sur sa
-                page.
+                {t("featureHistoryBody")}
               </li>
               <li>
                 <span className="font-display text-lg font-700 uppercase text-ink">
-                  Un tirage numéroté —{" "}
+                  {t("featureNumberedTitle")}{" "}
                 </span>
-                chaque drop a un nombre fixe d’exemplaires. Épuisé, c’est
-                définitif.
+                {t("featureNumberedBody")}
               </li>
               <li>
                 <span className="font-display text-lg font-700 uppercase text-ink">
-                  Des points fidélité —{" "}
+                  {t("featurePointsTitle")}{" "}
                 </span>
-                chaque achat crédite votre compte en points, échangeables en
-                réduction sur vos prochaines commandes.
+                {t("featurePointsBody")}
               </li>
             </ul>
           </div>

@@ -1,4 +1,5 @@
 import { formatPrice } from "@/lib/points";
+import type { Locale } from "@/i18n/routing";
 
 /**
  * The store's WhatsApp number in international format WITHOUT "+" or spaces,
@@ -24,31 +25,67 @@ export type WhatsAppOrderInput = {
   discountCents: number;
   shippingName: string;
   shippingPhone: string;
-  shippingAddress: string;
+  // Only the city is included in the prefilled message, not the street
+  // address — a wa.me URL can end up logged (browser history, analytics,
+  // proxies), and the full delivery address isn't needed there since it's
+  // already stored server-side and shown on the order confirmation page.
   shippingCity: string;
 };
 
-/** Builds the wa.me deep link with a prefilled French order summary. */
-export function buildOrderWhatsAppLink(order: WhatsAppOrderInput): string | null {
+const LABELS: Record<
+  Locale,
+  {
+    title: (id: string) => string;
+    discount: string;
+    total: (amount: string) => string;
+    confirm: string;
+  }
+> = {
+  fr: {
+    title: (id) => `🐺 *Street Wolf — Commande #${id}*`,
+    discount: "Réduction points",
+    total: (amount) => `*Total à la livraison : ${amount}*`,
+    confirm: "Je confirme ma commande ✅",
+  },
+  en: {
+    title: (id) => `🐺 *Street Wolf — Order #${id}*`,
+    discount: "Points discount",
+    total: (amount) => `*Total due on delivery: ${amount}*`,
+    confirm: "I confirm my order ✅",
+  },
+  ar: {
+    title: (id) => `🐺 *Street Wolf — طلب #${id}*`,
+    discount: "خصم النقاط",
+    total: (amount) => `*المجموع عند التسليم: ${amount}*`,
+    confirm: "أؤكد طلبي ✅",
+  },
+};
+
+/** Builds the wa.me deep link with a prefilled order summary in the given locale. */
+export function buildOrderWhatsAppLink(
+  order: WhatsAppOrderInput,
+  locale: Locale = "fr"
+): string | null {
   if (!WHATSAPP_NUMBER) return null;
+  const t = LABELS[locale];
 
   const lines = [
-    `🐺 *Street Wolf — Commande #${order.orderId.slice(0, 8)}*`,
+    t.title(order.orderId.slice(0, 8)),
     "",
     ...order.items.map(
       (it) =>
-        `• ${it.quantity} × ${it.productName}${it.size ? ` (${it.size})` : ""} — ${formatPrice(it.priceCents * it.quantity)}`
+        `• ${it.quantity} × ${it.productName}${it.size ? ` (${it.size})` : ""} — ${formatPrice(it.priceCents * it.quantity, locale)}`
     ),
     "",
     ...(order.discountCents > 0
-      ? [`Réduction points : −${formatPrice(order.discountCents)}`]
+      ? [`${t.discount} : −${formatPrice(order.discountCents, locale)}`]
       : []),
-    `*Total à la livraison : ${formatPrice(order.totalCents)}*`,
+    t.total(formatPrice(order.totalCents, locale)),
     "",
     `📍 ${order.shippingName} — ${order.shippingPhone}`,
-    `${order.shippingAddress}, ${order.shippingCity}`,
+    order.shippingCity,
     "",
-    "Je confirme ma commande ✅",
+    t.confirm,
   ];
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;

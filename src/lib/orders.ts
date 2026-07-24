@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   products,
@@ -9,6 +9,8 @@ import {
   users,
 } from "@/db/schema";
 import { pointsForTotal, pointsToDiscountCents, REDEEM_STEP } from "@/lib/points";
+import { resolveLocalized } from "@/lib/products";
+import type { Locale } from "@/i18n/routing";
 
 export type CheckoutItemInput = {
   productId: string;
@@ -23,10 +25,26 @@ export type ShippingInput = {
   city: string;
 };
 
+// Stable, presentation-independent codes — never translated text. The
+// caller (a Route Handler) maps these to localized copy via next-intl, and
+// tests can assert on the code without depending on any particular locale.
+export type CheckoutErrorCode =
+  | "user_not_found"
+  | "invalid_redeem_step"
+  | "insufficient_points"
+  | "product_unavailable"
+  | "insufficient_stock"
+  | "cart_empty";
+
 export class CheckoutError extends Error {
-  constructor(message: string) {
-    super(message);
+  code: CheckoutErrorCode;
+  params?: Record<string, string | number>;
+
+  constructor(code: CheckoutErrorCode, params?: Record<string, string | number>) {
+    super(code);
     this.name = "CheckoutError";
+    this.code = code;
+    this.params = params;
   }
 }
 
@@ -34,27 +52,29 @@ export class CheckoutError extends Error {
  * Places an order inside a single database transaction: re-checks stock
  * against the database (never trusts client-sent prices or availability),
  * decrements stock, redeems/awards loyalty points, and writes an auditable
- * points-ledger entry. Throws CheckoutError with a user-facing message on
- * any failure, which rolls back the whole transaction automatically.
+ * points-ledger entry. Throws CheckoutError on any failure, which rolls back
+ * the whole transaction automatically.
  *
- * Postgres transactions here are async (unlike the previous SQLite version
- * of this file) — every statement inside is awaited.
+ * `locale` only affects the human-readable productName snapshot stored on
+ * each order item — like a paper receipt, it's fixed at purchase time and
+ * doesn't change if the buyer later switches the site's language.
  */
 export async function placeOrder(
   userId: string,
   items: CheckoutItemInput[],
   shipping: ShippingInput,
-  pointsToRedeem: number
+  pointsToRedeem: number,
+  locale: Locale
 ) {
   return db.transaction(async (tx) => {
     const [user] = await tx.select().from(users).where(eq(users.id, userId)).limit(1);
-    if (!user) throw new CheckoutError("Utilisateur introuvable.");
+    if (!user) throw new CheckoutError("user_not_found");
 
     if (pointsToRedeem % REDEEM_STEP !== 0) {
-      throw new CheckoutError(`Les points s'échangent par tranches de ${REDEEM_STEP}.`);
+      throw new CheckoutError("invalid_redeem_step", { step: REDEEM_STEP });
     }
     if (pointsToRedeem > user.points) {
-      throw new CheckoutError("Solde de points insuffisant pour cet échange.");
+      throw new CheckoutError("insufficient_points");
     }
 
     let subtotalCents = 0;
@@ -75,18 +95,19 @@ export async function placeOrder(
         .limit(1);
 
       if (!product || !product.active) {
-        throw new CheckoutError("Un article du panier n'est plus disponible.");
+        throw new CheckoutError("product_unavailable");
       }
       if (product.stockRemaining < item.quantity) {
-        throw new CheckoutError(
-          `Quantité demandée pour « ${product.name} » indisponible — il n'en reste que ${product.stockRemaining}.`
-        );
+        throw new CheckoutError("insufficient_stock", {
+          productId: product.id,
+          remaining: product.stockRemaining,
+        });
       }
 
       subtotalCents += product.priceCents * item.quantity;
       preparedItems.push({
         productId: product.id,
-        productName: product.name,
+        productName: resolveLocalized(product.name, locale),
         size: item.size ?? null,
         quantity: item.quantity,
         priceCents: product.priceCents,
@@ -94,7 +115,7 @@ export async function placeOrder(
     }
 
     if (preparedItems.length === 0) {
-      throw new CheckoutError("Le panier est vide.");
+      throw new CheckoutError("cart_empty");
     }
 
     const discountCents = Math.min(
@@ -134,12 +155,32 @@ export async function placeOrder(
         priceCents: item.priceCents,
       });
 
-      await tx
+      // Atomic conditional decrement: the WHERE clause is checked by the
+      // same UPDATE that writes the new value, so under Postgres's default
+      // READ COMMITTED isolation the row gets locked on the first writer and
+      // a concurrent checkout for the same product re-reads the already
+      // decremented value and correctly fails here — instead of two
+      // concurrent transactions both reading "enough stock" before either
+      // writes, which could take stockRemaining negative.
+      const [updated] = await tx
         .update(products)
         .set({
           stockRemaining: sql`${products.stockRemaining} - ${item.quantity}`,
         })
-        .where(eq(products.id, item.productId));
+        .where(
+          and(
+            eq(products.id, item.productId),
+            sql`${products.stockRemaining} >= ${item.quantity}`
+          )
+        )
+        .returning({ id: products.id });
+
+      if (!updated) {
+        throw new CheckoutError("insufficient_stock", {
+          productId: item.productId,
+          remaining: 0,
+        });
+      }
     }
 
     if (pointsToRedeem > 0) {
@@ -147,7 +188,7 @@ export async function placeOrder(
         id: randomUUID(),
         userId,
         amount: -pointsToRedeem,
-        reason: "Points échangés à la commande",
+        reason: "redeemed_at_checkout",
         orderId,
       });
     }
@@ -156,7 +197,7 @@ export async function placeOrder(
       id: randomUUID(),
       userId,
       amount: pointsAwarded,
-      reason: "Points gagnés sur une commande",
+      reason: "earned_on_order",
       orderId,
     });
 

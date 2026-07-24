@@ -1,5 +1,11 @@
-import { pgTable, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { pgTable, text, integer, boolean, timestamp, jsonb, check } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+
+// A product's textual content is stored once per supported locale rather
+// than in a separate translations table: the locale set is small and fixed
+// (fr/en/ar), nothing ever needs to SQL-sort or filter by these fields, and
+// keeping them inline avoids a join on every product read.
+export type LocalizedText = { fr: string; en: string; ar: string };
 
 // --- Users ---------------------------------------------------------------
 export const users = pgTable("users", {
@@ -13,20 +19,33 @@ export const users = pgTable("users", {
 });
 
 // --- Products (each row = one limited, story-driven drop) -----------------
-export const products = pgTable("products", {
-  id: text("id").primaryKey(),
-  slug: text("slug").notNull().unique(),
-  name: text("name").notNull(),
-  tagline: text("tagline").notNull().default(""),
-  story: text("story").notNull(),
-  priceCents: integer("price_cents").notNull(),
-  images: text("images").notNull(),
-  sizes: text("sizes").notNull().default('["S","M","L","XL","XXL"]'),
-  totalStock: integer("total_stock").notNull(),
-  stockRemaining: integer("stock_remaining").notNull(),
-  active: boolean("active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+export const products = pgTable(
+  "products",
+  {
+    id: text("id").primaryKey(),
+    slug: text("slug").notNull().unique(),
+    name: jsonb("name").$type<LocalizedText>().notNull(),
+    tagline: jsonb("tagline")
+      .$type<LocalizedText>()
+      .notNull()
+      .default({ fr: "", en: "", ar: "" }),
+    story: jsonb("story").$type<LocalizedText>().notNull(),
+    priceCents: integer("price_cents").notNull(),
+    images: jsonb("images").$type<string[]>().notNull(),
+    sizes: jsonb("sizes")
+      .$type<string[]>()
+      .notNull()
+      .default(["S", "M", "L", "XL", "XXL"]),
+    totalStock: integer("total_stock").notNull(),
+    stockRemaining: integer("stock_remaining").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    check("stock_remaining_non_negative", sql`${table.stockRemaining} >= 0`),
+    check("total_stock_non_negative", sql`${table.totalStock} >= 0`),
+  ]
+);
 
 // --- Orders ------------------------------------------------------------
 // paymentMethod/paymentReference are deliberately generic (not Stripe-shaped)

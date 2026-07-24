@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter, Link } from "@/i18n/navigation";
 import { useCart } from "./CartContext";
 import { formatPrice, pointsToDiscountCents, REDEEM_STEP } from "@/lib/points";
 import { PAYMENT_METHODS } from "@/lib/payments";
 import { buildOrderWhatsAppLink } from "@/lib/whatsapp";
+import type { Locale } from "@/i18n/routing";
 
 export function CheckoutForm({
   userPoints,
@@ -17,6 +19,8 @@ export function CheckoutForm({
   defaultPhone: string;
 }) {
   const router = useRouter();
+  const locale = useLocale() as Locale;
+  const t = useTranslations("checkout");
   const { items, totalCents, clearCart } = useCart();
 
   const [name, setName] = useState(defaultName);
@@ -35,13 +39,21 @@ export function CheckoutForm({
   if (items.length === 0) {
     return (
       <p className="mt-8 text-ink-muted">
-        Votre panier est vide.{" "}
-        <a href="/shop" className="text-ink underline">
-          Voir la boutique
-        </a>
+        {t("empty")}{" "}
+        <Link href="/shop" className="text-ink underline">
+          {t("viewShop")}
+        </Link>
       </p>
     );
   }
+
+  const resolveError = (code: string | undefined) => {
+    if (!code) return t("errors.generic");
+    if (t.has(`errors.${code}` as "errors.generic")) {
+      return t(`errors.${code}` as "errors.generic");
+    }
+    return t("errors.generic");
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -59,31 +71,34 @@ export function CheckoutForm({
           })),
           shipping: { name, phone, address, city },
           pointsToRedeem,
+          locale,
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Commande impossible");
+      if (!res.ok) throw new Error(resolveError(data.error));
 
       // Straight to WhatsApp with the full order summary prefilled, so the
       // customer confirms in one conversation. The order is already saved in
       // the database at this point — WhatsApp is the confirmation channel,
       // not the source of truth. Falls back to the order page when no
       // WhatsApp number is configured.
-      const waLink = buildOrderWhatsAppLink({
-        orderId: data.orderId,
-        items: items.map((i) => ({
-          productName: i.name,
-          size: i.size,
-          quantity: i.quantity,
-          priceCents: i.priceCents,
-        })),
-        totalCents: data.totalCents,
-        discountCents: data.discountCents,
-        shippingName: name,
-        shippingPhone: phone,
-        shippingAddress: address,
-        shippingCity: city,
-      });
+      const waLink = buildOrderWhatsAppLink(
+        {
+          orderId: data.orderId,
+          items: items.map((i) => ({
+            productName: i.name,
+            size: i.size,
+            quantity: i.quantity,
+            priceCents: i.priceCents,
+          })),
+          totalCents: data.totalCents,
+          discountCents: data.discountCents,
+          shippingName: name,
+          shippingPhone: phone,
+          shippingCity: city,
+        },
+        locale
+      );
 
       clearCart();
       if (waLink) {
@@ -92,7 +107,7 @@ export function CheckoutForm({
         router.push(`/order/${data.orderId}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      setError(err instanceof Error ? err.message : t("errors.server_error"));
     } finally {
       setSubmitting(false);
     }
@@ -102,33 +117,33 @@ export function CheckoutForm({
     <form onSubmit={handleSubmit} className="mt-8 space-y-8">
       <div className="space-y-4">
         <h2 className="font-display text-xl font-700 uppercase tracking-[0.04em] text-ink">
-          Livraison
+          {t("shippingTitle")}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <input
             required
-            placeholder="Nom complet"
+            placeholder={t("namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver sm:col-span-2"
           />
           <input
             required
-            placeholder="Téléphone"
+            placeholder={t("phonePlaceholder")}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver"
           />
           <input
             required
-            placeholder="Ville"
+            placeholder={t("cityPlaceholder")}
             value={city}
             onChange={(e) => setCity(e.target.value)}
             className="border border-line bg-surface-1 px-4 py-3 text-ink outline-none focus:border-silver"
           />
           <textarea
             required
-            placeholder="Adresse complète"
+            placeholder={t("addressPlaceholder")}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             rows={3}
@@ -139,7 +154,7 @@ export function CheckoutForm({
 
       <div className="space-y-3">
         <h2 className="font-display text-xl font-700 uppercase tracking-[0.04em] text-ink">
-          Paiement
+          {t("paymentTitle")}
         </h2>
         {PAYMENT_METHODS.map((method) => (
           <label
@@ -157,11 +172,11 @@ export function CheckoutForm({
             />
             <span>
               <span className="block text-ink">
-                {method.label}
-                {!method.available && " (bientôt)"}
+                {t(`payment.${method.id}.label` as "payment.cod.label")}
+                {!method.available && ` ${t("paymentComingSoon")}`}
               </span>
               <span className="block text-sm text-ink-muted">
-                {method.description}
+                {t(`payment.${method.id}.description` as "payment.cod.description")}
               </span>
             </span>
           </label>
@@ -171,11 +186,10 @@ export function CheckoutForm({
       {userPoints > 0 && (
         <div className="space-y-3">
           <h2 className="font-display text-xl font-700 uppercase tracking-[0.04em] text-ink">
-            Utiliser mes points
+            {t("pointsTitle")}
           </h2>
           <p className="text-sm text-ink-muted">
-            Votre solde : <span className="font-mono text-ink">{userPoints}</span>{" "}
-            points
+            {t("pointsBalance", { points: userPoints })}
           </p>
           {maxRedeemSteps > 0 ? (
             <div className="flex items-center gap-4">
@@ -188,12 +202,15 @@ export function CheckoutForm({
                 className="flex-1 accent-[#c81e3a]"
               />
               <span className="w-44 shrink-0 font-mono text-sm text-ink">
-                {pointsToRedeem} pts = −{formatPrice(discountCents)}
+                {t("pointsRedeem", {
+                  points: pointsToRedeem,
+                  amount: formatPrice(discountCents, locale),
+                })}
               </span>
             </div>
           ) : (
             <p className="text-sm text-ink-faint">
-              Il faut au moins {REDEEM_STEP} points pour échanger.
+              {t("pointsMinNotice", { step: REDEEM_STEP })}
             </p>
           )}
         </div>
@@ -201,18 +218,18 @@ export function CheckoutForm({
 
       <div className="space-y-2 border-t border-line pt-6">
         <div className="flex justify-between text-ink-muted">
-          <span>Sous-total</span>
-          <span className="font-mono">{formatPrice(totalCents)}</span>
+          <span>{t("subtotal")}</span>
+          <span className="font-mono">{formatPrice(totalCents, locale)}</span>
         </div>
         {discountCents > 0 && (
           <div className="flex justify-between text-accent">
-            <span>Réduction points</span>
-            <span className="font-mono">−{formatPrice(discountCents)}</span>
+            <span>{t("discount")}</span>
+            <span className="font-mono">−{formatPrice(discountCents, locale)}</span>
           </div>
         )}
         <div className="flex justify-between text-lg text-ink">
-          <span>Total (à payer à la livraison)</span>
-          <span className="font-mono">{formatPrice(finalTotal)}</span>
+          <span>{t("total")}</span>
+          <span className="font-mono">{formatPrice(finalTotal, locale)}</span>
         </div>
       </div>
 
@@ -223,12 +240,9 @@ export function CheckoutForm({
         disabled={submitting}
         className="w-full bg-accent px-6 py-4 font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90 disabled:opacity-50"
       >
-        {submitting ? "Confirmation..." : "Confirmer la commande"}
+        {submitting ? t("submitting") : t("submit")}
       </button>
-      <p className="text-center text-sm text-ink-faint">
-        Après confirmation, vous serez redirigé vers WhatsApp avec le détail de
-        votre commande pour la valider avec nous.
-      </p>
+      <p className="text-center text-sm text-ink-faint">{t("whatsappNotice")}</p>
     </form>
   );
 }

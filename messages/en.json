@@ -1,0 +1,179 @@
+{
+  "nav": {
+    "shop": "Shop",
+    "account": "My Account",
+    "login": "Log in"
+  },
+  "cart": {
+    "aria": "{count, plural, one {Cart, # item} other {Cart, # items}}",
+    "empty": {
+      "title": "Your cart is empty",
+      "subtitle": "You haven’t added anything yet.",
+      "viewShop": "Browse the shop"
+    },
+    "title": "Cart",
+    "size": "Size: {size}",
+    "remove": "Remove",
+    "total": "Total",
+    "checkout": "Checkout"
+  },
+  "home": {
+    "marquee": "RULE THE STREETS — LIMITED EDITIONS — CASABLANCA — EVERY PIECE HAS A STORY — ",
+    "heroSubtitle": "Limited, numbered editions. Every piece has a story — once it’s sold out, it’s gone for good.",
+    "seeDrops": "See the drops",
+    "currentDrops": "Current drops",
+    "viewAll": "View full collection →",
+    "noProducts": "No products yet. Run <command>npm run db:seed</command> to add sample products.",
+    "collectionTitle": "Every piece, a limited edition",
+    "featureHistoryTitle": "A story —",
+    "featureHistoryBody": "every design has a reason to exist, told in full on its page.",
+    "featureNumberedTitle": "A numbered run —",
+    "featureNumberedBody": "every drop has a fixed number of pieces. Sold out means gone for good.",
+    "featurePointsTitle": "Loyalty points —",
+    "featurePointsBody": "every purchase credits your account with points, redeemable for a discount on future orders."
+  },
+  "shop": {
+    "title": "Shop",
+    "subtitle": "All available pieces. Limited editions — once sold out, it’s final.",
+    "empty": "No products available right now."
+  },
+  "product": {
+    "notFound": "Product not found",
+    "story": "The story",
+    "soldOut": "Sold out",
+    "soldOutNotice": "This edition is completely sold out. Follow us for the next drop.",
+    "size": "Size",
+    "quantity": "Quantity",
+    "addToCart": "Add to cart — {price}",
+    "added": "Added ✓ — View cart"
+  },
+  "edition": {
+    "limited": "Limited edition",
+    "soldOutCount": "{total}/{total} — sold out",
+    "remaining": "{remaining}/{total} left",
+    "soldOutAria": "Edition sold out",
+    "percentSoldAria": "{percent}% of the edition already sold"
+  },
+  "quantityStepper": {
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity"
+  },
+  "checkout": {
+    "pageTitle": "Complete my order",
+    "shippingTitle": "Shipping",
+    "namePlaceholder": "Full name",
+    "phonePlaceholder": "Phone",
+    "cityPlaceholder": "City",
+    "addressPlaceholder": "Full address",
+    "paymentTitle": "Payment",
+    "paymentComingSoon": "(coming soon)",
+    "payment": {
+      "cod": {
+        "label": "Cash on delivery",
+        "description": "Pay in cash to the courier on arrival. No account, no extra fees."
+      }
+    },
+    "pointsTitle": "Use my points",
+    "pointsBalance": "Your balance: {points} points",
+    "pointsRedeem": "{points} pts = −{amount}",
+    "pointsMinNotice": "You need at least {step} points to redeem.",
+    "subtotal": "Subtotal",
+    "discount": "Points discount",
+    "total": "Total (due on delivery)",
+    "submitting": "Confirming...",
+    "submit": "Confirm order",
+    "whatsappNotice": "After confirming, you’ll be redirected to WhatsApp with your order details to validate it with us.",
+    "empty": "Your cart is empty.",
+    "viewShop": "Browse the shop",
+    "errors": {
+      "user_not_found": "User not found.",
+      "invalid_redeem_step": "Points can only be redeemed in blocks of {step}.",
+      "insufficient_points": "Insufficient points balance for this redemption.",
+      "product_unavailable": "An item in your cart is no longer available.",
+      "insufficient_stock": "Only {remaining} unit(s) left for this item.",
+      "cart_empty": "Your cart is empty.",
+      "unauthenticated": "Log in to place an order.",
+      "rate_limited": "Too many attempts. Please try again in a few minutes.",
+      "server_error": "Couldn’t complete the order. Please try again.",
+      "generic": "Order could not be placed"
+    }
+  },
+  "validation": {
+    "invalid_email": "Invalid email address",
+    "password_too_short": "Password must be at least 8 characters",
+    "password_required": "Enter your password",
+    "name_too_short": "Name is too short",
+    "phone_invalid": "Invalid phone number",
+    "address_too_short": "Address is too short",
+    "city_required": "City is required",
+    "cart_empty": "Cart is empty",
+    "invalid_input": "Invalid data"
+  },
+  "order": {
+    "title": "Order received",
+    "orderNumber": "Order number: {id}",
+    "confirmOnWhatsapp": "Confirm on WhatsApp",
+    "sizeAndQty": "Size {size} × {quantity}",
+    "subtotal": "Subtotal",
+    "discount": "Points discount",
+    "total": "Total (due on delivery)",
+    "pointsEarned": "You earned {points} points with this order.",
+    "shippingAddress": "Shipping address"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "loading": "...",
+      "noAccount": "Don’t have an account yet?",
+      "createAccount": "Create an account"
+    },
+    "register": {
+      "title": "Create an account",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "password": "Password (8 characters minimum)",
+      "submit": "Create my account",
+      "loading": "...",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "errors": {
+      "invalid_credentials": "Incorrect email or password.",
+      "email_taken": "This email address is already in use.",
+      "rate_limited": "Too many attempts. Please try again in a few minutes.",
+      "generic_login": "Could not log in",
+      "generic_register": "Could not create account"
+    }
+  },
+  "account": {
+    "title": "My account",
+    "pointsBalance": "Points balance",
+    "pointsRule": "Every {step} points = {amount} off at checkout.",
+    "myOrders": "My orders",
+    "noOrders": "No orders yet.",
+    "pointsHistory": "Points history",
+    "noPointsHistory": "No activity yet.",
+    "status": {
+      "pending": "Processing",
+      "confirmed": "Confirmed",
+      "fulfilled": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "pointsReason": {
+      "redeemed_at_checkout": "Points redeemed at checkout",
+      "earned_on_order": "Points earned on an order"
+    }
+  },
+  "footer": {
+    "tagline": "Limited editions, every piece has a story. Sold out means sold out.",
+    "rights": "All rights reserved."
+  },
+  "metadata": {
+    "siteDescription": "Limited editions, every piece has a story. Once it’s sold out, it doesn’t come back.",
+    "shopTitle": "Shop — Street Wolf"
+  }
+}

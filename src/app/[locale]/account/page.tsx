@@ -1,31 +1,40 @@
-import { redirect } from "next/navigation";
 import { eq, desc } from "drizzle-orm";
-import Link from "next/link";
+import { getTranslations, getFormatter, setRequestLocale } from "next-intl/server";
+import { redirect, Link } from "@/i18n/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/db";
 import { users, orders, pointsTransactions } from "@/db/schema";
 import { formatPrice, pointsToDiscountCents, REDEEM_STEP } from "@/lib/points";
+import type { Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
-function statusLabel(status: string) {
-  if (status === "pending") return "En traitement";
-  if (status === "confirmed") return "Confirmée";
-  if (status === "fulfilled") return "Livrée";
-  if (status === "cancelled") return "Annulée";
-  return status;
-}
-
-export default async function AccountPage() {
+export default async function AccountPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const session = await getSession();
-  if (!session) redirect("/login?next=/account");
+  // next-intl's redirect() is typed to return `never`, same as
+  // next/navigation's, but its more complex generic signature isn't always
+  // enough for TS to narrow `session` afterward — the explicit `return`
+  // makes the control-flow analysis unambiguous regardless.
+  if (!session) {
+    redirect({ href: "/login?next=/account", locale });
+    return;
+  }
 
   const [user] = await db
     .select()
     .from(users)
     .where(eq(users.id, session.userId))
     .limit(1);
-  if (!user) redirect("/login?next=/account");
+  if (!user) {
+    redirect({ href: "/login?next=/account", locale });
+    return;
+  }
 
   const myOrders = await db
     .select()
@@ -39,32 +48,43 @@ export default async function AccountPage() {
     .where(eq(pointsTransactions.userId, session.userId))
     .orderBy(desc(pointsTransactions.createdAt));
 
+  const t = await getTranslations("account");
+  const format = await getFormatter();
+
+  const statusLabel = (status: string) =>
+    t.has(`status.${status}`) ? t(`status.${status}` as "status.pending") : status;
+  const pointsReasonLabel = (reason: string) =>
+    t.has(`pointsReason.${reason}`)
+      ? t(`pointsReason.${reason}` as "pointsReason.earned_on_order")
+      : reason;
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-16">
       <div className="claw-divider mb-4" />
       <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-        Mon compte
+        {t("title")}
       </h1>
       <p className="mt-1 text-ink-muted">{user.email}</p>
 
       <div className="edition-plate mt-8 border-accent/40 bg-accent-soft p-6">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-muted">
-          Solde de points
+          {t("pointsBalance")}
         </p>
         <p className="mt-1 font-mono text-4xl text-ink">{user.points}</p>
         <p className="mt-2 text-sm text-ink-muted">
-          Chaque tranche de {REDEEM_STEP} points ={" "}
-          {formatPrice(pointsToDiscountCents(REDEEM_STEP))} de réduction au
-          paiement.
+          {t("pointsRule", {
+            step: REDEEM_STEP,
+            amount: formatPrice(pointsToDiscountCents(REDEEM_STEP), locale),
+          })}
         </p>
       </div>
 
       <section className="mt-12">
         <h2 className="font-display text-2xl font-700 uppercase tracking-[0.04em] text-ink">
-          Mes commandes
+          {t("myOrders")}
         </h2>
         {myOrders.length === 0 ? (
-          <p className="mt-3 text-ink-muted">Aucune commande pour l’instant.</p>
+          <p className="mt-3 text-ink-muted">{t("noOrders")}</p>
         ) : (
           <div className="mt-4 divide-y divide-line border-y border-line">
             {myOrders.map((o) => (
@@ -76,11 +96,13 @@ export default async function AccountPage() {
                 <div>
                   <p className="font-mono text-ink">#{o.id.slice(0, 8)}</p>
                   <p className="text-sm text-ink-faint">
-                    {new Date(o.createdAt).toLocaleDateString("fr-MA")}
+                    {format.dateTime(o.createdAt, { dateStyle: "medium" })}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-mono text-ink">{formatPrice(o.totalCents)}</p>
+                <div className="text-end">
+                  <p className="font-mono text-ink">
+                    {formatPrice(o.totalCents, locale)}
+                  </p>
                   <p className="text-sm text-ink-faint">{statusLabel(o.status)}</p>
                 </div>
               </Link>
@@ -91,23 +113,25 @@ export default async function AccountPage() {
 
       <section className="mb-16 mt-12">
         <h2 className="font-display text-2xl font-700 uppercase tracking-[0.04em] text-ink">
-          Historique des points
+          {t("pointsHistory")}
         </h2>
         {ledger.length === 0 ? (
-          <p className="mt-3 text-ink-muted">Aucun mouvement pour l’instant.</p>
+          <p className="mt-3 text-ink-muted">{t("noPointsHistory")}</p>
         ) : (
           <div className="mt-4 divide-y divide-line border-y border-line">
-            {ledger.map((t) => (
+            {ledger.map((tItem) => (
               <div
-                key={t.id}
+                key={tItem.id}
                 className="flex items-center justify-between py-3 text-sm"
               >
-                <span className="text-ink-muted">{t.reason}</span>
+                <span className="text-ink-muted">
+                  {pointsReasonLabel(tItem.reason)}
+                </span>
                 <span
-                  className={`font-mono ${t.amount >= 0 ? "text-silver" : "text-accent"}`}
+                  className={`font-mono ${tItem.amount >= 0 ? "text-silver" : "text-accent"}`}
                 >
-                  {t.amount >= 0 ? "+" : ""}
-                  {t.amount}
+                  {tItem.amount >= 0 ? "+" : ""}
+                  {tItem.amount}
                 </span>
               </div>
             ))}

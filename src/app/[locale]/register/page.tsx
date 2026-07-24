@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useRouter, Link } from "@/i18n/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations("auth.register");
+  const tErrors = useTranslations("auth.errors");
+  const tValidation = useTranslations("validation");
   const [next, setNext] = useState("/account");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,6 +25,13 @@ export default function RegisterPage() {
     setNext(params.get("next") || "/account");
   }, []);
 
+  const resolveError = (code: string | undefined) => {
+    if (!code) return tErrors("generic_register");
+    if (tErrors.has(code)) return tErrors(code);
+    if (tValidation.has(code)) return tValidation(code);
+    return tErrors("generic_register");
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -33,11 +43,11 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, phone, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Création du compte impossible");
+      if (!res.ok) throw new Error(resolveError(data.error));
       router.push(next);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      setError(err instanceof Error ? err.message : tErrors("generic_register"));
     } finally {
       setLoading(false);
     }
@@ -47,11 +57,11 @@ export default function RegisterPage() {
     <div className="mx-auto max-w-md px-5 py-20">
       <div className="claw-divider mb-4" />
       <h1 className="font-display text-4xl font-700 uppercase tracking-[0.04em] text-ink">
-        Créer un compte
+        {t("title")}
       </h1>
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm text-ink-muted">Nom complet</label>
+          <label className="mb-1.5 block text-sm text-ink-muted">{t("name")}</label>
           <input
             required
             value={name}
@@ -60,7 +70,7 @@ export default function RegisterPage() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm text-ink-muted">E-mail</label>
+          <label className="mb-1.5 block text-sm text-ink-muted">{t("email")}</label>
           <input
             type="email"
             required
@@ -70,9 +80,7 @@ export default function RegisterPage() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm text-ink-muted">
-            Téléphone (facultatif)
-          </label>
+          <label className="mb-1.5 block text-sm text-ink-muted">{t("phone")}</label>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -80,9 +88,7 @@ export default function RegisterPage() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm text-ink-muted">
-            Mot de passe (8 caractères minimum)
-          </label>
+          <label className="mb-1.5 block text-sm text-ink-muted">{t("password")}</label>
           <input
             type="password"
             required
@@ -98,13 +104,13 @@ export default function RegisterPage() {
           disabled={loading}
           className="w-full bg-accent px-6 py-3 font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? "..." : "Créer mon compte"}
+          {loading ? t("loading") : t("submit")}
         </button>
       </form>
       <p className="mt-6 text-sm text-ink-muted">
-        Déjà un compte ?{" "}
+        {t("haveAccount")}{" "}
         <Link href="/login" className="text-ink underline">
-          Se connecter
+          {t("login")}
         </Link>
       </p>
     </div>

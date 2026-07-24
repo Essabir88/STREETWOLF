@@ -1,0 +1,179 @@
+{
+  "nav": {
+    "shop": "Boutique",
+    "account": "Mon compte",
+    "login": "Connexion"
+  },
+  "cart": {
+    "aria": "{count, plural, one {Panier, # article} other {Panier, # articles}}",
+    "empty": {
+      "title": "Panier vide",
+      "subtitle": "Vous n’avez encore rien ajouté.",
+      "viewShop": "Voir la boutique"
+    },
+    "title": "Panier",
+    "size": "Taille : {size}",
+    "remove": "Retirer",
+    "total": "Total",
+    "checkout": "Passer commande"
+  },
+  "home": {
+    "marquee": "RULE THE STREETS — ÉDITIONS LIMITÉES — CASABLANCA — CHAQUE PIÈCE A SON HISTOIRE — ",
+    "heroSubtitle": "Éditions limitées et numérotées. Chaque pièce a son histoire — quand c’est épuisé, ça ne revient pas.",
+    "seeDrops": "Voir les drops",
+    "currentDrops": "Les drops en cours",
+    "viewAll": "Toute la collection →",
+    "noProducts": "Aucun produit pour l’instant. Lancez <command>npm run db:seed</command> pour ajouter des exemples.",
+    "collectionTitle": "Chaque pièce, une édition limitée",
+    "featureHistoryTitle": "Une histoire —",
+    "featureHistoryBody": "chaque design a une raison d’exister, racontée en entier sur sa page.",
+    "featureNumberedTitle": "Un tirage numéroté —",
+    "featureNumberedBody": "chaque drop a un nombre fixe d’exemplaires. Épuisé, c’est définitif.",
+    "featurePointsTitle": "Des points fidélité —",
+    "featurePointsBody": "chaque achat crédite votre compte en points, échangeables en réduction sur vos prochaines commandes."
+  },
+  "shop": {
+    "title": "Boutique",
+    "subtitle": "Toutes les pièces disponibles. Éditions limitées — épuisé, c’est définitif.",
+    "empty": "Aucun produit disponible pour le moment."
+  },
+  "product": {
+    "notFound": "Produit introuvable",
+    "story": "L’histoire",
+    "soldOut": "Épuisé",
+    "soldOutNotice": "Cette édition est entièrement épuisée. Suivez-nous pour le prochain drop.",
+    "size": "Taille",
+    "quantity": "Quantité",
+    "addToCart": "Ajouter au panier — {price}",
+    "added": "Ajouté ✓ — Voir le panier"
+  },
+  "edition": {
+    "limited": "Édition limitée",
+    "soldOutCount": "{total}/{total} — épuisé",
+    "remaining": "reste {remaining}/{total}",
+    "soldOutAria": "Édition épuisée",
+    "percentSoldAria": "{percent} % de l’édition déjà vendue"
+  },
+  "quantityStepper": {
+    "decrease": "Diminuer la quantité",
+    "increase": "Augmenter la quantité"
+  },
+  "checkout": {
+    "pageTitle": "Finaliser ma commande",
+    "shippingTitle": "Livraison",
+    "namePlaceholder": "Nom complet",
+    "phonePlaceholder": "Téléphone",
+    "cityPlaceholder": "Ville",
+    "addressPlaceholder": "Adresse complète",
+    "paymentTitle": "Paiement",
+    "paymentComingSoon": "(bientôt)",
+    "payment": {
+      "cod": {
+        "label": "Paiement à la livraison",
+        "description": "Payez en espèces au livreur à la réception. Aucun compte, aucuns frais supplémentaires."
+      }
+    },
+    "pointsTitle": "Utiliser mes points",
+    "pointsBalance": "Votre solde : {points} points",
+    "pointsRedeem": "{points} pts = −{amount}",
+    "pointsMinNotice": "Il faut au moins {step} points pour échanger.",
+    "subtotal": "Sous-total",
+    "discount": "Réduction points",
+    "total": "Total (à payer à la livraison)",
+    "submitting": "Confirmation...",
+    "submit": "Confirmer la commande",
+    "whatsappNotice": "Après confirmation, vous serez redirigé vers WhatsApp avec le détail de votre commande pour la valider avec nous.",
+    "empty": "Votre panier est vide.",
+    "viewShop": "Voir la boutique",
+    "errors": {
+      "user_not_found": "Utilisateur introuvable.",
+      "invalid_redeem_step": "Les points s’échangent par tranches de {step}.",
+      "insufficient_points": "Solde de points insuffisant pour cet échange.",
+      "product_unavailable": "Un article du panier n’est plus disponible.",
+      "insufficient_stock": "Il ne reste que {remaining} exemplaire(s) disponible(s) pour cet article.",
+      "cart_empty": "Le panier est vide.",
+      "unauthenticated": "Connectez-vous pour commander.",
+      "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "server_error": "Impossible de finaliser la commande. Réessayez.",
+      "generic": "Commande impossible"
+    }
+  },
+  "validation": {
+    "invalid_email": "Adresse e-mail invalide",
+    "password_too_short": "Le mot de passe doit contenir au moins 8 caractères",
+    "password_required": "Entrez votre mot de passe",
+    "name_too_short": "Le nom est trop court",
+    "phone_invalid": "Numéro de téléphone invalide",
+    "address_too_short": "L’adresse est trop courte",
+    "city_required": "La ville est requise",
+    "cart_empty": "Le panier est vide",
+    "invalid_input": "Données invalides"
+  },
+  "order": {
+    "title": "Commande reçue",
+    "orderNumber": "N° de commande : {id}",
+    "confirmOnWhatsapp": "Confirmer sur WhatsApp",
+    "sizeAndQty": "Taille {size} × {quantity}",
+    "subtotal": "Sous-total",
+    "discount": "Réduction points",
+    "total": "Total (à payer à la livraison)",
+    "pointsEarned": "Vous avez gagné {points} points avec cette commande.",
+    "shippingAddress": "Adresse de livraison"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "loading": "...",
+      "noAccount": "Pas encore de compte ?",
+      "createAccount": "Créer un compte"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "name": "Nom complet",
+      "email": "E-mail",
+      "phone": "Téléphone (facultatif)",
+      "password": "Mot de passe (8 caractères minimum)",
+      "submit": "Créer mon compte",
+      "loading": "...",
+      "haveAccount": "Déjà un compte ?",
+      "login": "Se connecter"
+    },
+    "errors": {
+      "invalid_credentials": "E-mail ou mot de passe incorrect.",
+      "email_taken": "Cette adresse e-mail est déjà utilisée.",
+      "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "generic_login": "Connexion impossible",
+      "generic_register": "Création du compte impossible"
+    }
+  },
+  "account": {
+    "title": "Mon compte",
+    "pointsBalance": "Solde de points",
+    "pointsRule": "Chaque tranche de {step} points = {amount} de réduction au paiement.",
+    "myOrders": "Mes commandes",
+    "noOrders": "Aucune commande pour l’instant.",
+    "pointsHistory": "Historique des points",
+    "noPointsHistory": "Aucun mouvement pour l’instant.",
+    "status": {
+      "pending": "En traitement",
+      "confirmed": "Confirmée",
+      "fulfilled": "Livrée",
+      "cancelled": "Annulée"
+    },
+    "pointsReason": {
+      "redeemed_at_checkout": "Points échangés à la commande",
+      "earned_on_order": "Points gagnés sur une commande"
+    }
+  },
+  "footer": {
+    "tagline": "Éditions limitées, chaque pièce a son histoire. Épuisé, c’est épuisé.",
+    "rights": "Tous droits réservés."
+  },
+  "metadata": {
+    "siteDescription": "Éditions limitées, chaque pièce a son histoire. Quand c’est épuisé, ça ne revient pas.",
+    "shopTitle": "Boutique — Street Wolf"
+  }
+}

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { useCart } from "./CartContext";
 import { QuantityStepper } from "./QuantityStepper";
 import { formatPrice } from "@/lib/points";
+import type { Locale } from "@/i18n/routing";
 
 export function AddToCartForm({
   productId,
@@ -25,6 +27,8 @@ export function AddToCartForm({
 }) {
   const { addItem } = useCart();
   const router = useRouter();
+  const t = useTranslations("product");
+  const locale = useLocale() as Locale;
   const [size, setSize] = useState<string | null>(sizes[0] ?? null);
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
@@ -44,7 +48,7 @@ export function AddToCartForm({
   if (soldOut) {
     return (
       <div className="edition-plate px-4 py-3 text-sm text-ink-muted">
-        Cette édition est entièrement épuisée. Suivez-nous pour le prochain drop.
+        {t("soldOutNotice")}
       </div>
     );
   }
@@ -54,7 +58,7 @@ export function AddToCartForm({
       {sizes.length > 0 && (
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
-            Taille
+            {t("size")}
           </p>
           <div className="flex flex-wrap gap-2">
             {sizes.map((s) => (
@@ -77,7 +81,7 @@ export function AddToCartForm({
 
       <div className="flex items-center gap-4">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
-          Quantité
+          {t("quantity")}
         </p>
         <QuantityStepper
           value={quantity}
@@ -92,7 +96,7 @@ export function AddToCartForm({
           onClick={handleAdd}
           className="flex-1 bg-accent px-6 py-3.5 text-center font-display text-lg font-700 uppercase tracking-[0.14em] text-ink transition hover:opacity-90"
         >
-          Ajouter au panier — {formatPrice(priceCents * quantity)}
+          {t("addToCart", { price: formatPrice(priceCents * quantity, locale) })}
         </button>
         {justAdded && (
           <button
@@ -100,7 +104,7 @@ export function AddToCartForm({
             onClick={() => router.push("/cart")}
             className="border border-line px-4 py-3.5 text-sm text-ink transition hover:border-silver"
           >
-            Ajouté ✓ — Voir le panier
+            {t("added")}
           </button>
         )}
       </div>

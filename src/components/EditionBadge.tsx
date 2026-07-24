@@ -1,8 +1,10 @@
+import { getTranslations } from "next-intl/server";
+
 /**
  * The numbered-plate treatment: every drop is a serigraph-style edition.
  * The depletion bar encodes real stock data — structure as information.
  */
-export function EditionBadge({
+export async function EditionBadge({
   totalStock,
   stockRemaining,
   size = "sm",
@@ -11,6 +13,7 @@ export function EditionBadge({
   stockRemaining: number;
   size?: "sm" | "lg";
 }) {
+  const t = await getTranslations("edition");
   const soldOut = stockRemaining <= 0;
   const low = !soldOut && stockRemaining / totalStock <= 0.15;
   const pctGone = Math.round(((totalStock - stockRemaining) / totalStock) * 100);
@@ -23,26 +26,22 @@ export function EditionBadge({
         }`}
       >
         <span className="font-medium uppercase tracking-[0.14em] text-ink-faint">
-          Édition limitée
+          {t("limited")}
         </span>
         {soldOut ? (
           <span className="font-mono text-ink-muted">
-            {totalStock}/{totalStock} — épuisé
+            {t("soldOutCount", { total: totalStock })}
           </span>
         ) : (
           <span className={`font-mono ${low ? "text-accent" : "text-silver"}`}>
-            reste {stockRemaining}/{totalStock}
+            {t("remaining", { remaining: stockRemaining, total: totalStock })}
           </span>
         )}
       </div>
       <div
         className={`edition-bar ${low ? "low" : ""}`}
         role="img"
-        aria-label={
-          soldOut
-            ? "Édition épuisée"
-            : `${pctGone} % de l'édition déjà vendue`
-        }
+        aria-label={soldOut ? t("soldOutAria") : t("percentSoldAria", { percent: pctGone })}
       >
         <span style={{ width: `${pctGone}%` }} />
       </div>

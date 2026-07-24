@@ -21,7 +21,10 @@ const pool =
     connectionString,
     // Managed Postgres (Neon, Supabase, Render, ...) requires SSL; local
     // Postgres for development normally doesn't have a cert configured.
-    ssl: isLocal ? false : { rejectUnauthorized: false },
+    // rejectUnauthorized: true validates the server certificate against
+    // Node's trust store — Neon and other major managed providers present a
+    // publicly-trusted cert, so this works without extra CA configuration.
+    ssl: isLocal ? false : { rejectUnauthorized: true },
   });
 
 if (process.env.NODE_ENV !== "production") {

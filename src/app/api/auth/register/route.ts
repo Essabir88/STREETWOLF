@@ -9,13 +9,26 @@ import {
   createSessionToken,
   sessionCookieOptions,
 } from "@/lib/auth";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(
+    `register:${clientIp(request)}`,
+    5,
+    60 * 60 * 1000
+  );
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(retryAfterMs / 1000)) } }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
+      { error: parsed.error.issues[0]?.message ?? "invalid_input" },
       { status: 400 }
     );
   }
@@ -27,10 +40,7 @@ export async function POST(request: Request) {
     .where(eq(users.email, email))
     .limit(1);
   if (existing) {
-    return NextResponse.json(
-      { error: "Cette adresse e-mail est déjà utilisée." },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "email_taken" }, { status: 409 });
   }
 
   const passwordHash = await hashPassword(password);
